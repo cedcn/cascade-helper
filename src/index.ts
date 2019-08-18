@@ -1,48 +1,95 @@
-import { isEmpty, forEach, isUndefined, cloneDeep } from 'lodash'
+import { isEmpty, forEach, isUndefined, cloneDeep, times } from 'lodash'
 
-/*
- * Retrun new array
- * Not mutates original choices
- */
-export const flattenInlineCascadeChoices = (choices: any, endLevel?: number): any => {
-  const results: any[] = []
-  const traverse = (choices: any, path?: string, level?: number, str?: string): any => {
-    forEach(choices, (choice, index) => {
-      const cStr = !isUndefined(str) ? str + '-' + choice.name : choice.name
-      let cLevel = !isUndefined(level) ? level : 1
-      const cPath = !isUndefined(path) ? `${path}.subChoices[${index}]` : `[${index}]`
+interface Cascade {
+  [key: string]: any
+}
 
-      if (!isEmpty(choice.subChoices) && (isUndefined(endLevel) || (!isUndefined(endLevel) && cLevel < endLevel))) {
-        cLevel++
-        return traverse(choice.subChoices, cPath, cLevel, cStr)
-      }
+interface Strs {
+  [key: string]: string
+}
 
-      results.push({ name: cStr, choice: cloneDeep(choice), path: cPath })
-    })
+interface FlattenResult {
+  strs: Strs
+  cascade: Cascade
+  path: string
+}
+
+const generateCascade = (level: number, index: number): Cascade => ({
+  name: `${level}级选项 ${index + 1}`,
+  value: `${+new Date()}-${++index}`,
+})
+
+class CascadeHelper {
+  public subKey: string
+  public valueKey: string
+  public constructor(subKey: string = 'children', valueKey: string = 'value') {
+    this.subKey = subKey
+    this.valueKey = valueKey
   }
+  public flatten(cascades: Cascade[], labels: string[] = [], endLevel?: number): FlattenResult[] {
+    const results: FlattenResult[] = []
+    const { subKey } = this
 
-  traverse(choices)
-  return results
-}
+    const traverse = (cascades: Cascade[], strs: Strs = {}, path?: string, level?: number): void => {
+      forEach(cascades, (cascade, index) => {
+        let cStrs: Strs = {}
+        forEach(labels, (label) => {
+          cStrs[label] = !isUndefined(strs[label]) ? strs[label] + '-' + cascade[label] : cascade[label]
+        })
 
-/*
- * For each choice
- */
-export const forEachCascadeChoices = (
-  choices: any,
-  cb: (choice: any, currentlevel?: number, currentIndex?: string) => void,
-  startLevel: number = 1,
-  endLevel?: number
-): any => {
-  forEach(choices, (choice, index) => {
-    cb(choice, startLevel, index)
-    if (!isEmpty(choice.subChoices)) {
-      if (endLevel && startLevel >= endLevel) {
-        return
+        let cLevel = !isUndefined(level) ? level : 1
+        const cPath = !isUndefined(path) ? `${path}.${subKey}[${index}]` : `[${index}]`
+
+        if (!isEmpty(cascade[subKey]) && (isUndefined(endLevel) || (!isUndefined(endLevel) && cLevel < endLevel))) {
+          cLevel++
+          return traverse(cascade[subKey], cStrs, cPath, cLevel)
+        }
+
+        results.push({ strs: cStrs, cascade: cloneDeep(cascade), path: cPath })
+      })
+    }
+
+    traverse(cascades)
+    return results
+  }
+  
+  public fill(
+    cascades: Cascade[] = [],
+    count: number = 2,
+    startLevel: number = 1,
+    endLevel: number = 2,
+    geterateFunc: (level: number, index: number) => Cascade = generateCascade
+  ): Cascade[] {
+    const { subKey } = this
+    let newCascades = { [subKey]: cloneDeep(cascades) }
+
+    if (startLevel > endLevel) {
+      return newCascades[subKey]
+    }
+
+    const setInit = (level: number, cascade: Cascade): void => {
+      if (isUndefined(cascade[subKey])) {
+        cascade[subKey] = []
       }
 
-      forEachCascadeChoices(choice.subChoices, cb, startLevel + 1, endLevel)
+      if (isEmpty(cascade[subKey])) {
+        times(count, (xIndex) => {
+          if (isUndefined(cascade[subKey][xIndex])) {
+            cascade[subKey][xIndex] = geterateFunc(level, xIndex)
+          }
+        })
+      }
+
+      forEach(cascade[subKey], (choice) => {
+        if (level < endLevel) {
+          setInit(level + 1, choice)
+        }
+      })
     }
-  })
+
+    setInit(startLevel, newCascades)
+    return newCascades[subKey]
+  }
 }
 
+export default CascadeHelper
