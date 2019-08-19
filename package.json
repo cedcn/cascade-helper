@@ -4,7 +4,10 @@
   "description": "Cascade Helper",
   "main": "index.js",
   "scripts": {
-    "build": "babel src --out-dir dist --extensions .js,.jsx,.ts,.tsx --source-maps --ignore **/*.test.ts",
+    "build": "yarn build-src && yarn build-dts",
+    "build-src": "babel src --out-dir dist --extensions .js,.jsx,.ts,.tsx --source-maps --ignore **/*.test.ts",
+    "build-dts": "tsc --emitDeclarationOnly",
+    "typecheck": "tsc --noEmit",
     "lint-eslint": "eslint --ext .js,.jsx,.ts,.tsx ./",
     "test": "jest"
   },
