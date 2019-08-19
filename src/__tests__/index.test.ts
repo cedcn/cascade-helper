@@ -6,8 +6,8 @@ const mockValue = generateRandomString
 
 describe('CascadeHelper', () => {
   const cascadeHelper = new CascadeHelper()
-  test('instance method - cascadeFill', () => {
-    const cascades = cascadeHelper.cascadeFill()
+  test('instance method - cascadesFill', () => {
+    const cascades = cascadeHelper.cascadesFill()
     const expectCascades = [
       {
         name: '0.0',
@@ -42,7 +42,7 @@ describe('CascadeHelper', () => {
   })
 
   test('instance method - flatten', () => {
-    const cascades = cascadeHelper.cascadeFill()
+    const cascades = cascadeHelper.cascadesFill()
     const results = cascadeHelper.flatten(cascades, ['name'])
     const expectResults = [
       {
@@ -70,9 +70,9 @@ describe('CascadeHelper', () => {
     expect(expectResults).toEqual(results)
   })
 
-  test('instance method - cascadeForEach', () => {
-    const cascades = cascadeHelper.cascadeFill()
-    cascadeHelper.cascadeForEach(cascades, (cascade: Cascade, currentlevel?: number, currentIndex?: number) => {
+  test('instance method - cascadesForEach', () => {
+    const cascades = cascadeHelper.cascadesFill()
+    cascadeHelper.cascadesForEach(cascades, (cascade: Cascade, currentlevel?: number, currentIndex?: number) => {
       cascade.name = `modify-${currentlevel}-${currentIndex}`
     })
 
@@ -111,7 +111,7 @@ describe('CascadeHelper', () => {
   })
 
   test('instance method - initValues', () => {
-    const cascades = cascadeHelper.cascadeFill()
+    const cascades = cascadeHelper.cascadesFill()
     const values = cascadeHelper.initValues(cascades, 2)
     const expectValues = { level0: mockValue(0, 0), level1: mockValue(1, 0) }
     expect(expectValues).toEqual(values)
@@ -119,5 +119,21 @@ describe('CascadeHelper', () => {
     const values2 = cascadeHelper.initValues(cascades, 2, 1)
     const expectValues2 = { level0: mockValue(0, 1), level1: mockValue(1, 1) }
     expect(expectValues2).toEqual(values2)
+  })
+
+  test('instance method - getLevelCascades', () => {
+    const cascades = cascadeHelper.cascadesFill()
+    const current = cascadeHelper.getLevelCascades(cascades, { level0: mockValue(0, 0), level1: mockValue(1, 1) }, 1)
+    const expectCurrent = {
+      cascades: [{ name: '1.0', value: mockValue(1, 0) }, { name: '1.1', value: mockValue(1, 1) }],
+      path: '[0].children',
+      parent: {
+        cascade: cascades[0],
+        index: 0,
+        level: 0,
+      },
+    }
+
+    expect(expectCurrent).toEqual(current)
   })
 })

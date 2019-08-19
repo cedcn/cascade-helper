@@ -35,11 +35,8 @@ var CascadeHelper =
 /*#__PURE__*/
 function () {
   function CascadeHelper() {
-    var _this = this;
-
-    var _subKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'children';
-
-    var _valueKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'value';
+    var subKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'children';
+    var valueKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'value';
 
     _classCallCheck(this, CascadeHelper);
 
@@ -47,20 +44,8 @@ function () {
 
     _defineProperty(this, "valueKey", void 0);
 
-    _defineProperty(this, "initValues", function (cascades, levels) {
-      var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var subKey = _this.subKey,
-          valueKey = _this.valueKey;
-      return (0, _lodash.reduce)((0, _lodash.times)(levels), function (acc, _curr, level) {
-        acc["level".concat(level)] = (0, _lodash.get)(cascades, "[".concat(index, "]") + (0, _lodash.times)(level, function () {
-          return "".concat(subKey, "[").concat(index, "]");
-        }).join('.') + valueKey);
-        return acc;
-      }, {});
-    });
-
-    this.subKey = _subKey;
-    this.valueKey = _valueKey;
+    this.subKey = subKey;
+    this.valueKey = valueKey;
   }
 
   _createClass(CascadeHelper, [{
@@ -104,8 +89,8 @@ function () {
      */
 
   }, {
-    key: "cascadeFill",
-    value: function cascadeFill() {
+    key: "cascadesFill",
+    value: function cascadesFill() {
       var cascades = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
       var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
       var startLevel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
@@ -147,9 +132,9 @@ function () {
      */
 
   }, {
-    key: "cascadeForEach",
-    value: function cascadeForEach(cascades, cb) {
-      var _this2 = this;
+    key: "cascadesForEach",
+    value: function cascadesForEach(cascades, cb) {
+      var _this = this;
 
       var startLevel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var endLevel = arguments.length > 3 ? arguments[3] : undefined;
@@ -162,7 +147,7 @@ function () {
             return;
           }
 
-          _this2.cascadeForEach(cascade[subKey], cb, startLevel + 1, endLevel);
+          _this.cascadesForEach(cascade[subKey], cb, startLevel + 1, endLevel);
         }
       });
     }
@@ -171,6 +156,87 @@ function () {
      * Get the first value of cascades by default
      */
 
+  }, {
+    key: "initValues",
+    value: function initValues(cascades, levels) {
+      var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      var subKey = this.subKey,
+          valueKey = this.valueKey;
+      return (0, _lodash.reduce)((0, _lodash.times)(levels), function (acc, _curr, level) {
+        acc["level".concat(level)] = (0, _lodash.get)(cascades, "[".concat(index, "]") + (0, _lodash.times)(level, function () {
+          return "".concat(subKey, "[").concat(index, "]");
+        }).join('.') + valueKey);
+        return acc;
+      }, {});
+    }
+    /*
+     * Get the specified level cascades by current values
+     */
+
+  }, {
+    key: "getLevelCascades",
+    value: function getLevelCascades(cascades, values, level) {
+      var path = '';
+      var subKey = this.subKey,
+          valueKey = this.valueKey;
+
+      if (level <= 0) {
+        return {
+          cascades: cascades || [],
+          path: path,
+          parent: null
+        };
+      }
+
+      var prevLevel = level - 1;
+
+      if (values && (0, _lodash.isEmpty)(values["level".concat(prevLevel)])) {
+        return {
+          cascades: [],
+          path: path,
+          parent: null
+        };
+      }
+
+      var querySubCascades = function querySubCascades(startLevel, endLevel, subCascades) {
+        var targetValue = values && values["level".concat(startLevel)];
+        var current = (0, _lodash.find)(subCascades, function (cascade) {
+          return (0, _lodash.get)(cascade, valueKey) === targetValue;
+        });
+        var currentIndex = (0, _lodash.indexOf)(subCascades, current);
+        path += "[".concat(currentIndex, "].").concat(subKey);
+
+        if (!current) {
+          return {
+            subCascades: [],
+            parent: null
+          };
+        }
+
+        if (startLevel >= endLevel) {
+          return {
+            subCascades: current[subKey] || [],
+            parent: {
+              cascade: current,
+              index: currentIndex,
+              level: startLevel
+            }
+          };
+        }
+
+        return querySubCascades(startLevel + 1, endLevel, current[subKey] || []);
+      };
+
+      var _querySubCascades = querySubCascades(0, prevLevel, cascades),
+          subCascades = _querySubCascades.subCascades,
+          parent = _querySubCascades.parent;
+
+      return {
+        cascades: subCascades,
+        path: path,
+        parent: parent
+      };
+    }
   }]);
 
   return CascadeHelper;

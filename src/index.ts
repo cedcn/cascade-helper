@@ -1,4 +1,4 @@
-import { isEmpty, forEach, isUndefined, cloneDeep, get, reduce, times } from 'lodash'
+import { isEmpty, forEach, isUndefined, cloneDeep, get, find, reduce, indexOf, times } from 'lodash'
 
 export interface Cascade {
   [key: string]: any
@@ -6,6 +6,10 @@ export interface Cascade {
 
 interface Strs {
   [key: string]: string
+}
+
+interface Values {
+  [key: string]: any
 }
 
 interface FlattenResult {
@@ -65,7 +69,7 @@ class CascadeHelper {
   /*
    * Fill cascade
    */
-  public cascadeFill(
+  public cascadesFill(
     cascades: Cascade[] = [],
     count: number = 2,
     startLevel: number = 0,
@@ -106,7 +110,7 @@ class CascadeHelper {
   /*
    * For each cascade
    */
-  public cascadeForEach(
+  public cascadesForEach(
     cascades: Cascade[],
     cb: (cascade: Cascade, currentlevel?: number, currentIndex?: number) => void,
     startLevel: number = 0,
@@ -121,7 +125,7 @@ class CascadeHelper {
           return
         }
 
-        this.cascadeForEach(cascade[subKey], cb, startLevel + 1, endLevel)
+        this.cascadesForEach(cascade[subKey], cb, startLevel + 1, endLevel)
       }
     })
   }
@@ -130,7 +134,7 @@ class CascadeHelper {
    * Get init values
    * Get the first value of cascades by default
    */
-  public initValues = (cascades: Cascade[], levels: number, index: number = 0) => {
+  public initValues(cascades: Cascade[], levels: number, index: number = 0): Values {
     const { subKey, valueKey } = this
 
     return reduce<any, { [key: string]: string }>(
@@ -144,6 +148,55 @@ class CascadeHelper {
       },
       {}
     )
+  }
+
+  /*
+   * Get the specified level cascades by current values
+   */
+
+  public getLevelCascades(
+    cascades: Cascade[],
+    values: Values,
+    level: number
+  ): {
+    cascades: Cascade[]
+    path: string
+    parent: Cascade | null
+  } {
+    let path = ''
+    const { subKey, valueKey } = this
+
+    if (level <= 0) {
+      return { cascades: cascades || [], path, parent: null }
+    }
+
+    const prevLevel = level - 1
+    if (values && isEmpty(values[`level${prevLevel}`])) {
+      return { cascades: [], path, parent: null }
+    }
+
+    const querySubCascades = (startLevel: number, endLevel: number, subCascades: Cascade[]): any => {
+      const targetValue = values && values[`level${startLevel}`]
+      const current = find(subCascades, (cascade) => get(cascade, valueKey) === targetValue)
+      const currentIndex = indexOf(subCascades, current)
+      path += `[${currentIndex}].${subKey}`
+
+      if (!current) {
+        return { subCascades: [], parent: null }
+      }
+
+      if (startLevel >= endLevel) {
+        return {
+          subCascades: current[subKey] || [],
+          parent: { cascade: current, index: currentIndex, level: startLevel },
+        }
+      }
+
+      return querySubCascades(startLevel + 1, endLevel, current[subKey] || [])
+    }
+
+    const { subCascades, parent } = querySubCascades(0, prevLevel, cascades)
+    return { cascades: subCascades, path, parent }
   }
 }
 

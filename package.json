@@ -4,7 +4,7 @@
   "description": "Cascade Helper",
   "main": "index.js",
   "scripts": {
-    "build": "babel src --out-dir dist --extensions .js,.jsx,.ts,.tsx --source-maps",
+    "build": "babel src --out-dir dist --extensions .js,.jsx,.ts,.tsx --source-maps --ignore **/*.test.ts",
     "lint-eslint": "eslint --ext .js,.jsx,.ts,.tsx ./",
     "test": "jest"
   },
