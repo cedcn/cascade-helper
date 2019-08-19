@@ -1,6 +1,6 @@
 import { isEmpty, forEach, isUndefined, cloneDeep, times } from 'lodash'
 
-interface Cascade {
+export interface Cascade {
   [key: string]: any
 }
 
@@ -13,6 +13,7 @@ interface FlattenResult {
   cascade: Cascade
   path: string
 }
+
 export const generateRandomString = (): string =>
   Math.random()
     .toString(36)
@@ -30,6 +31,7 @@ class CascadeHelper {
     this.subKey = subKey
     this.valueKey = valueKey
   }
+
   public flatten(cascades: Cascade[], labels: string[] = [], endLevel?: number): FlattenResult[] {
     const results: FlattenResult[] = []
     const { subKey } = this
@@ -41,7 +43,7 @@ class CascadeHelper {
           cStrs[label] = !isUndefined(strs[label]) ? strs[label] + '-' + cascade[label] : cascade[label]
         })
 
-        let cLevel = !isUndefined(level) ? level : 1
+        let cLevel = !isUndefined(level) ? level : 0
         const cPath = !isUndefined(path) ? `${path}.${subKey}[${index}]` : `[${index}]`
 
         if (!isEmpty(cascade[subKey]) && (isUndefined(endLevel) || (!isUndefined(endLevel) && cLevel < endLevel))) {
@@ -57,11 +59,14 @@ class CascadeHelper {
     return results
   }
 
-  public fill(
+  /*
+   * fill cascade
+   */
+  public cascadeFill(
     cascades: Cascade[] = [],
     count: number = 2,
-    startLevel: number = 1,
-    endLevel: number = 2,
+    startLevel: number = 0,
+    endLevel: number = 1,
     geterateFunc: (level: number, index: number) => Cascade = generateCascade
   ): Cascade[] {
     const { subKey } = this
@@ -93,6 +98,29 @@ class CascadeHelper {
 
     setInit(startLevel, newCascades)
     return newCascades[subKey]
+  }
+
+  /*
+   * For each cascade
+   */
+  public cascadeForEach(
+    cascades: Cascade[],
+    cb: (cascade: Cascade, currentlevel?: number, currentIndex?: number) => void,
+    startLevel: number = 0,
+    endLevel?: number
+  ): void {
+    const { subKey } = this
+
+    forEach(cascades, (cascade, index) => {
+      cb(cascade, startLevel, index)
+      if (!isEmpty(cascade[subKey])) {
+        if (endLevel && startLevel >= endLevel) {
+          return
+        }
+
+        this.cascadeForEach(cascade[subKey], cb, startLevel + 1, endLevel)
+      }
+    })
   }
 }
 
