@@ -7,6 +7,18 @@ exports["default"] = exports.generateRandomString = void 0;
 
 var _lodash = require("lodash");
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -52,7 +64,8 @@ function () {
     key: "flatten",
     value: function flatten(cascades) {
       var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var endLevel = arguments.length > 2 ? arguments[2] : undefined;
+      var itemSeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '-';
+      var endLevel = arguments.length > 3 ? arguments[3] : undefined;
       var results = [];
       var subKey = this.subKey;
 
@@ -63,7 +76,7 @@ function () {
         (0, _lodash.forEach)(cascades, function (cascade, index) {
           var cStrs = {};
           (0, _lodash.forEach)(labels, function (label) {
-            cStrs[label] = !(0, _lodash.isUndefined)(strs[label]) ? strs[label] + '-' + cascade[label] : cascade[label];
+            cStrs[label] = !(0, _lodash.isUndefined)(strs[label]) ? strs[label] + itemSeparator + cascade[label] : cascade[label];
           });
           var cLevel = !(0, _lodash.isUndefined)(level) ? level : 0;
           var cPath = !(0, _lodash.isUndefined)(path) ? "".concat(path, ".").concat(subKey, "[").concat(index, "]") : "[".concat(index, "]");
@@ -93,9 +106,9 @@ function () {
     value: function cascadesFill() {
       var cascades = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
       var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-      var startLevel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var endLevel = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-      var geterateFunc = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : generateCascade;
+      var geterateFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : generateCascade;
+      var startLevel = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+      var endLevel = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
       var subKey = this.subKey;
 
       var newCascades = _defineProperty({}, subKey, (0, _lodash.cloneDeep)(cascades));
@@ -117,9 +130,9 @@ function () {
           });
         }
 
-        (0, _lodash.forEach)(cascade[subKey], function (choice) {
+        (0, _lodash.forEach)(cascade[subKey], function (item) {
           if (level < endLevel) {
-            setInit(level + 1, choice);
+            setInit(level + 1, item);
           }
         });
       };
@@ -236,6 +249,79 @@ function () {
         path: path,
         parent: parent
       };
+    }
+    /*
+     * To structure cascades by text
+     */
+
+  }, {
+    key: "parse",
+    value: function parse(str, cb) {
+      var itemSeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '-';
+      var levelSeparator = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '\n';
+      var subKey = this.subKey,
+          valueKey = this.valueKey;
+
+      var parseLabels = function parseLabels(tArr) {
+        var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+        var result = (0, _lodash.reduce)(tArr, function (acc, curr) {
+          if (!acc[curr[0]]) {
+            acc[curr[0]] = [];
+          }
+
+          var newCurr = (0, _lodash.filter)(curr, function (item) {
+            return item !== curr[0];
+          });
+
+          if (newCurr.length > 0) {
+            acc[curr[0]] = [].concat(_toConsumableArray(acc[curr[0]]), [newCurr]);
+          }
+
+          return acc;
+        }, {});
+        var cLevel = level;
+        var index = 0;
+        level++;
+        return (0, _lodash.map)(result, function (item, key) {
+          var cascade;
+
+          if ((0, _lodash.isEmpty)(item)) {
+            cascade = _objectSpread({}, cb(key, valueKey, cLevel, index));
+          } else {
+            cascade = _objectSpread(_defineProperty({}, subKey, parseLabels(item, level)), cb(key, valueKey, cLevel, index));
+          }
+
+          index++;
+          return cascade;
+        });
+      };
+
+      var trimedStr = (0, _lodash.trim)(str);
+
+      if ((0, _lodash.isEmpty)(trimedStr)) {
+        return [];
+      }
+
+      var arr = trimedStr.split(levelSeparator);
+      var tArr = (0, _lodash.map)(arr, function (item) {
+        return item.split(itemSeparator);
+      });
+      return parseLabels(tArr);
+    }
+    /*
+     * Serialize string to cascades
+     */
+
+  }, {
+    key: "stringify",
+    value: function stringify(cascades, label) {
+      var itemSeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '-';
+      var levelSeparator = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '\n';
+      var endLevel = arguments.length > 4 ? arguments[4] : undefined;
+      var results = this.flatten(cascades, [label], itemSeparator, endLevel);
+      return (0, _lodash.map)(results, function (item) {
+        return item.strs[label];
+      }).join(levelSeparator);
     }
   }]);
 
