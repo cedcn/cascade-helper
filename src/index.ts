@@ -1,4 +1,4 @@
-import { isEmpty, forEach, isUndefined, cloneDeep, get, find, reduce, indexOf, times } from 'lodash'
+import { isEmpty, forEach, isUndefined, cloneDeep, get, trim, find, filter, map, reduce, indexOf, times } from 'lodash'
 
 export interface Cascade {
   [key: string]: any
@@ -96,9 +96,9 @@ class CascadeHelper {
         })
       }
 
-      forEach(cascade[subKey], (choice) => {
+      forEach(cascade[subKey], (item) => {
         if (level < endLevel) {
-          setInit(level + 1, choice)
+          setInit(level + 1, item)
         }
       })
     }
@@ -153,7 +153,6 @@ class CascadeHelper {
   /*
    * Get the specified level cascades by current values
    */
-
   public getLevelCascades(
     cascades: Cascade[],
     values: Values,
@@ -197,6 +196,59 @@ class CascadeHelper {
 
     const { subCascades, parent } = querySubCascades(0, prevLevel, cascades)
     return { cascades: subCascades, path, parent }
+  }
+
+  public parse(
+    str: string,
+    cb: (key: string, valueKey: string, level: number, index: number) => Cascade,
+    itemSeparator: string = '-',
+    levelSeparator: string = '\n'
+  ): Cascade[] {
+    const { subKey, valueKey } = this
+    const parseLabels = (tArr: string[][], level: number = 0): Cascade[] => {
+      const result = reduce<any, { [key: string]: string[][] }>(
+        tArr,
+        (acc, curr) => {
+          if (!acc[curr[0]]) {
+            acc[curr[0]] = []
+          }
+          const newCurr = filter(curr, (item) => item !== curr[0])
+          if (newCurr.length > 0) {
+            acc[curr[0]] = [...acc[curr[0]], newCurr]
+          }
+
+          return acc
+        },
+        {}
+      )
+      const cLevel = level
+      let index = 0
+      level++
+      return map(result, (item, key) => {
+        let cascade
+
+        if (isEmpty(item)) {
+          cascade = { ...cb(key, valueKey, cLevel, index) }
+        } else {
+          cascade = {
+            [subKey]: parseLabels(item, level),
+            ...cb(key, valueKey, cLevel, index),
+          }
+        }
+
+        index++
+        return cascade
+      })
+    }
+
+    const trimedStr = trim(str)
+    if (isEmpty(trimedStr)) {
+      return []
+    }
+    const arr = trimedStr.split(levelSeparator)
+    const tArr = map(arr, (item) => item.split(itemSeparator))
+
+    return parseLabels(tArr)
   }
 }
 

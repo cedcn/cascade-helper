@@ -6,7 +6,7 @@ const mockValue = generateRandomString
 
 describe('CascadeHelper', () => {
   const cascadeHelper = new CascadeHelper()
-  test('instance method - cascadesFill', () => {
+  test('instance method [cascadesFill] - should return structured cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     const expectCascades = [
       {
@@ -38,10 +38,10 @@ describe('CascadeHelper', () => {
         ],
       },
     ]
-    expect(cascades).toEqual(expectCascades)
+    expect(expectCascades).toEqual(cascades)
   })
 
-  test('instance method - flatten', () => {
+  test('instance method [flatten] - should return results contain cascade of last level', () => {
     const cascades = cascadeHelper.cascadesFill()
     const results = cascadeHelper.flatten(cascades, ['name'])
     const expectResults = [
@@ -67,10 +67,29 @@ describe('CascadeHelper', () => {
       },
     ]
 
-    expect(expectResults).toEqual(results)
+    expect(results).toEqual(expectResults)
   })
 
-  test('instance method - cascadesForEach', () => {
+  test('instance method [flatten] - should return results contain cascade of specified end level', () => {
+    const cascades = cascadeHelper.cascadesFill()
+    const results = cascadeHelper.flatten(cascades, ['name'], 0)
+    const expectResults = [
+      {
+        strs: { name: '0.0' },
+        cascade: { name: '0.0', value: mockValue(0, 0), children: cascades[0].children },
+        path: '[0]',
+      },
+      {
+        strs: { name: '0.1' },
+        cascade: { name: '0.1', value: mockValue(0, 1), children: cascades[1].children },
+        path: '[1]',
+      },
+    ]
+
+    expect(results).toEqual(expectResults)
+  })
+
+  test('instance method [cascadesForEach] - should modify origin cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     cascadeHelper.cascadesForEach(cascades, (cascade: Cascade, currentlevel?: number, currentIndex?: number) => {
       cascade.name = `modify-${currentlevel}-${currentIndex}`
@@ -107,21 +126,24 @@ describe('CascadeHelper', () => {
       },
     ]
 
-    expect(expectCascades).toEqual(cascades)
+    expect(cascades).toEqual(expectCascades)
   })
 
-  test('instance method - initValues', () => {
+  test('instance method [initValues] - should return the first value of cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     const values = cascadeHelper.initValues(cascades, 2)
     const expectValues = { level0: mockValue(0, 0), level1: mockValue(1, 0) }
-    expect(expectValues).toEqual(values)
-
-    const values2 = cascadeHelper.initValues(cascades, 2, 1)
-    const expectValues2 = { level0: mockValue(0, 1), level1: mockValue(1, 1) }
-    expect(expectValues2).toEqual(values2)
+    expect(values).toEqual(expectValues)
   })
 
-  test('instance method - getLevelCascades', () => {
+  test('instance method [initValues] - should return the first value of specified index of cascades', () => {
+    const cascades = cascadeHelper.cascadesFill()
+    const values = cascadeHelper.initValues(cascades, 2, 1)
+    const expectValues = { level0: mockValue(0, 1), level1: mockValue(1, 1) }
+    expect(values).toEqual(expectValues)
+  })
+
+  test('instance method [getLevelCascades] - should return cascades result of specified level cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     const current = cascadeHelper.getLevelCascades(cascades, { level0: mockValue(0, 0), level1: mockValue(1, 1) }, 1)
     const expectCurrent = {
@@ -134,6 +156,77 @@ describe('CascadeHelper', () => {
       },
     }
 
-    expect(expectCurrent).toEqual(current)
+    expect(current).toEqual(expectCurrent)
+  })
+
+  test('Instance method [parse] - should return structured cascades', () => {
+    const str =
+      '一级选项1-二级选项1\n一级选项1-二级选项1-三级选项1\n一级选项1-二级选项2\n一级选项1-二级选项3\n一级选项2-二级选项1\n一级选项2-二级选项2\n一级选项2-二级选项3\n一级选项3-二级选项1\n'
+    const results = cascadeHelper.parse(str, (key, valueKey, level, index) => {
+      return { name: key, [valueKey]: mockValue(level, index) }
+    })
+    const expectResults = [
+      {
+        name: '一级选项1',
+        value: mockValue(0, 0),
+        children: [
+          {
+            name: '二级选项1',
+            value: mockValue(1, 0),
+            children: [
+              {
+                name: '三级选项1',
+                value: mockValue(2, 0),
+              },
+            ],
+          },
+          {
+            name: '二级选项2',
+            value: mockValue(1, 1),
+          },
+          {
+            name: '二级选项3',
+            value: mockValue(1, 2),
+          },
+        ],
+      },
+      {
+        name: '一级选项2',
+        value: mockValue(0, 1),
+        children: [
+          {
+            name: '二级选项1',
+            value: mockValue(1, 0),
+          },
+          {
+            name: '二级选项2',
+            value: mockValue(1, 1),
+          },
+          {
+            name: '二级选项3',
+            value: mockValue(1, 2),
+          },
+        ],
+      },
+      {
+        name: '一级选项3',
+        value: mockValue(0, 2),
+        children: [
+          {
+            name: '二级选项1',
+            value: mockValue(1, 0),
+          },
+        ],
+      },
+    ]
+    expect(results).toEqual(expectResults)
+  })
+
+  test('Instance method [parse] - should return empty array when string is empty', () => {
+    const str = ''
+    const results = cascadeHelper.parse(str, (key, valueKey, level, index) => {
+      return { name: key, [valueKey]: mockValue(level, index) }
+    })
+    expect(results).toEqual([])
   })
 })

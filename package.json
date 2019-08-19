@@ -2,14 +2,15 @@
   "name": "cascade-helper",
   "version": "1.0.0",
   "description": "Cascade Helper",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "yarn build-src && yarn build-dts",
     "build-src": "babel src --out-dir dist --extensions .js,.jsx,.ts,.tsx --source-maps --ignore **/*.test.ts",
     "build-dts": "tsc --emitDeclarationOnly",
     "typecheck": "tsc --noEmit",
     "lint-eslint": "eslint --ext .js,.jsx,.ts,.tsx ./",
-    "test": "jest"
+    "test": "jest",
+    "test-inspect": "babel-node --inspect node_modules/.bin/jest --runInBand"
   },
   "keywords": [
     "cascade"
