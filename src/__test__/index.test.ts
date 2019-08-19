@@ -1,14 +1,72 @@
-import CascadeHelper from '../index'
+import CascadeHelper, { generateRandomString } from '../index'
 
-test('object assignment', () => {
+const random = Math.random()
+Math.random = jest.fn().mockReturnValue(random)
+const mockValue = generateRandomString()
+
+describe('CascadeHelper', () => {
   const cascadeHelper = new CascadeHelper()
-  const cascades = cascadeHelper.fill([], 2, 1, 3, (level: number, index: number) => ({
-    name: `${level}层级 ${index + 1}`,
-    value: `${+new Date()}-${++index}`,
-  }))
+  test('instance method - fill', () => {
+    const cascades = cascadeHelper.fill()
+    const expectCascades = [
+      {
+        name: '1.0',
+        value: mockValue,
+        children: [
+          {
+            name: '2.0',
+            value: mockValue,
+          },
+          {
+            name: '2.1',
+            value: mockValue,
+          },
+        ],
+      },
+      {
+        name: '1.1',
+        value: mockValue,
+        children: [
+          {
+            name: '2.0',
+            value: mockValue,
+          },
+          {
+            name: '2.1',
+            value: mockValue,
+          },
+        ],
+      },
+    ]
+    expect(cascades).toEqual(expectCascades)
+  })
 
-  const results = cascadeHelper.flatten(cascades, ['name'])
-  console.log('cascades', cascades)
-  console.log('results', results)
-  expect(typeof cascadeHelper.fill).toEqual('function')
+  test('instance method - flatten', () => {
+    const cascades = cascadeHelper.fill()
+    const results = cascadeHelper.flatten(cascades, ['name'])
+    const expectResults = [
+      {
+        strs: { name: '1.0-2.0' },
+        cascade: { name: '2.0', value: mockValue },
+        path: '[0].children[0]',
+      },
+      {
+        strs: { name: '1.0-2.1' },
+        cascade: { name: '2.1', value: mockValue },
+        path: '[0].children[1]',
+      },
+      {
+        strs: { name: '1.1-2.0' },
+        cascade: { name: '2.0', value: mockValue },
+        path: '[1].children[0]',
+      },
+      {
+        strs: { name: '1.1-2.1' },
+        cascade: { name: '2.1', value: mockValue },
+        path: '[1].children[1]',
+      },
+    ]
+
+    expect(expectResults).toEqual(results)
+  })
 })

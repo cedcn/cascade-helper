@@ -13,10 +13,14 @@ interface FlattenResult {
   cascade: Cascade
   path: string
 }
+export const generateRandomString = (): string =>
+  Math.random()
+    .toString(36)
+    .substr(2, 7)
 
 const generateCascade = (level: number, index: number): Cascade => ({
-  name: `${level}级选项 ${index + 1}`,
-  value: `${+new Date()}-${++index}`,
+  name: `${level}.${index}`,
+  value: generateRandomString(),
 })
 
 class CascadeHelper {
@@ -52,7 +56,7 @@ class CascadeHelper {
     traverse(cascades)
     return results
   }
-  
+
   public fill(
     cascades: Cascade[] = [],
     count: number = 2,
