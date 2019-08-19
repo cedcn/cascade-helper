@@ -1,4 +1,4 @@
-import { isEmpty, forEach, isUndefined, cloneDeep, times } from 'lodash'
+import { isEmpty, forEach, isUndefined, cloneDeep, get, reduce, times } from 'lodash'
 
 export interface Cascade {
   [key: string]: any
@@ -14,14 +14,17 @@ interface FlattenResult {
   path: string
 }
 
-export const generateRandomString = (): string =>
-  Math.random()
+export const generateRandomString = (level: number = 0, index: number = 0): string => {
+  const str = Math.random()
     .toString(36)
     .substr(2, 7)
 
+  return str + '-' + level + '-' + index
+}
+
 const generateCascade = (level: number, index: number): Cascade => ({
   name: `${level}.${index}`,
-  value: generateRandomString(),
+  value: generateRandomString(level, index),
 })
 
 class CascadeHelper {
@@ -60,7 +63,7 @@ class CascadeHelper {
   }
 
   /*
-   * fill cascade
+   * Fill cascade
    */
   public cascadeFill(
     cascades: Cascade[] = [],
@@ -121,6 +124,26 @@ class CascadeHelper {
         this.cascadeForEach(cascade[subKey], cb, startLevel + 1, endLevel)
       }
     })
+  }
+
+  /*
+   * Get init values
+   * Get the first value of cascades by default
+   */
+  public initValues = (cascades: Cascade[], levels: number, index: number = 0) => {
+    const { subKey, valueKey } = this
+
+    return reduce<any, { [key: string]: string }>(
+      times(levels),
+      (acc, _curr, level) => {
+        acc[`level${level}`] = get(
+          cascades,
+          `[${index}]` + times(level, () => `${subKey}[${index}]`).join('.') + valueKey
+        )
+        return acc
+      },
+      {}
+    )
   }
 }
 
