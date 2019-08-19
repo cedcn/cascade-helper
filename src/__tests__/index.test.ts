@@ -6,7 +6,7 @@ const mockValue = generateRandomString
 
 describe('CascadeHelper', () => {
   const cascadeHelper = new CascadeHelper()
-  test('instance method [cascadesFill] - should return structured cascades', () => {
+  test('Instance method [cascadesFill] - should return structured cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     const expectCascades = [
       {
@@ -41,7 +41,7 @@ describe('CascadeHelper', () => {
     expect(expectCascades).toEqual(cascades)
   })
 
-  test('instance method [flatten] - should return results contain cascade of last level', () => {
+  test('Instance method [flatten] - should return results contain cascade of last level', () => {
     const cascades = cascadeHelper.cascadesFill()
     const results = cascadeHelper.flatten(cascades, ['name'])
     const expectResults = [
@@ -70,9 +70,9 @@ describe('CascadeHelper', () => {
     expect(results).toEqual(expectResults)
   })
 
-  test('instance method [flatten] - should return results contain cascade of specified end level', () => {
+  test('Instance method [flatten] - should return results contain cascade of specified end level', () => {
     const cascades = cascadeHelper.cascadesFill()
-    const results = cascadeHelper.flatten(cascades, ['name'], 0)
+    const results = cascadeHelper.flatten(cascades, ['name'], '-', 0)
     const expectResults = [
       {
         strs: { name: '0.0' },
@@ -89,7 +89,7 @@ describe('CascadeHelper', () => {
     expect(results).toEqual(expectResults)
   })
 
-  test('instance method [cascadesForEach] - should modify origin cascades', () => {
+  test('Instance method [cascadesForEach] - should modify origin cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     cascadeHelper.cascadesForEach(cascades, (cascade: Cascade, currentlevel?: number, currentIndex?: number) => {
       cascade.name = `modify-${currentlevel}-${currentIndex}`
@@ -129,21 +129,21 @@ describe('CascadeHelper', () => {
     expect(cascades).toEqual(expectCascades)
   })
 
-  test('instance method [initValues] - should return the first value of cascades', () => {
+  test('Instance method [initValues] - should return the first value of cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     const values = cascadeHelper.initValues(cascades, 2)
     const expectValues = { level0: mockValue(0, 0), level1: mockValue(1, 0) }
     expect(values).toEqual(expectValues)
   })
 
-  test('instance method [initValues] - should return the first value of specified index of cascades', () => {
+  test('Instance method [initValues] - should return the first value of specified index of cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     const values = cascadeHelper.initValues(cascades, 2, 1)
     const expectValues = { level0: mockValue(0, 1), level1: mockValue(1, 1) }
     expect(values).toEqual(expectValues)
   })
 
-  test('instance method [getLevelCascades] - should return cascades result of specified level cascades', () => {
+  test('Instance method [getLevelCascades] - should return cascades result of specified level cascades', () => {
     const cascades = cascadeHelper.cascadesFill()
     const current = cascadeHelper.getLevelCascades(cascades, { level0: mockValue(0, 0), level1: mockValue(1, 1) }, 1)
     const expectCurrent = {
@@ -228,5 +228,15 @@ describe('CascadeHelper', () => {
       return { name: key, [valueKey]: mockValue(level, index) }
     })
     expect(results).toEqual([])
+  })
+
+  test('Instance method [stringify] - should return serialize string', () => {
+    const cascades = cascadeHelper.cascadesFill([], 3, (level: number, index: number) => {
+      return { name: `${level + 1}xxx${index}` }
+    })
+
+    const str = cascadeHelper.stringify(cascades, 'name')
+    const expectStr = '1xxx0-2xxx0\n1xxx0-2xxx1\n1xxx0-2xxx2\n1xxx1-2xxx0\n1xxx1-2xxx1\n1xxx1-2xxx2\n1xxx2-2xxx0\n1xxx2-2xxx1\n1xxx2-2xxx2'
+    expect(expectStr).toEqual(str)
   })
 })

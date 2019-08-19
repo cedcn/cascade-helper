@@ -39,7 +39,12 @@ class CascadeHelper {
     this.valueKey = valueKey
   }
 
-  public flatten(cascades: Cascade[], labels: string[] = [], endLevel?: number): FlattenResult[] {
+  public flatten(
+    cascades: Cascade[],
+    labels: string[] = [],
+    itemSeparator: string = '-',
+    endLevel?: number
+  ): FlattenResult[] {
     const results: FlattenResult[] = []
     const { subKey } = this
 
@@ -47,7 +52,7 @@ class CascadeHelper {
       forEach(cascades, (cascade, index) => {
         let cStrs: Strs = {}
         forEach(labels, (label) => {
-          cStrs[label] = !isUndefined(strs[label]) ? strs[label] + '-' + cascade[label] : cascade[label]
+          cStrs[label] = !isUndefined(strs[label]) ? strs[label] + itemSeparator + cascade[label] : cascade[label]
         })
 
         let cLevel = !isUndefined(level) ? level : 0
@@ -72,9 +77,9 @@ class CascadeHelper {
   public cascadesFill(
     cascades: Cascade[] = [],
     count: number = 2,
+    geterateFunc: (level: number, index: number) => Cascade = generateCascade,
     startLevel: number = 0,
-    endLevel: number = 1,
-    geterateFunc: (level: number, index: number) => Cascade = generateCascade
+    endLevel: number = 1
   ): Cascade[] {
     const { subKey } = this
     let newCascades = { [subKey]: cloneDeep(cascades) }
@@ -198,6 +203,9 @@ class CascadeHelper {
     return { cascades: subCascades, path, parent }
   }
 
+  /*
+   * To structure cascades by text
+   */
   public parse(
     str: string,
     cb: (key: string, valueKey: string, level: number, index: number) => Cascade,
@@ -249,6 +257,21 @@ class CascadeHelper {
     const tArr = map(arr, (item) => item.split(itemSeparator))
 
     return parseLabels(tArr)
+  }
+
+  /*
+   * Serialize string to cascades
+   */
+
+  public stringify(
+    cascades: Cascade[],
+    label: string,
+    itemSeparator: string = '-',
+    levelSeparator: string = '\n',
+    endLevel?: number
+  ): string {
+    const results = this.flatten(cascades, [label], itemSeparator, endLevel)
+    return map(results, (item) => item.strs[label]).join(levelSeparator)
   }
 }
 
