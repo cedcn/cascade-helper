@@ -20,7 +20,7 @@ declare class CascadeHelper {
     flatten(cascades: Cascade[], labels?: string[], itemSeparator?: string, endLevel?: number): FlattenResult[];
     cascadesFill(cascades?: Cascade[], count?: number, geterateFunc?: (level: number, index: number) => Cascade, startLevel?: number, endLevel?: number): Cascade[];
     cascadesForEach(cascades: Cascade[], cb: (cascade: Cascade, currentlevel?: number, currentIndex?: number) => void, startLevel?: number, endLevel?: number): void;
-    initValues(cascades: Cascade[], levels: number, index?: number): Values;
+    initValues(cascades: Cascade[], levelCount: number, index?: number): Values;
     getLevelCascades(cascades: Cascade[], values: Values, level: number): {
         cascades: Cascade[];
         path: string;

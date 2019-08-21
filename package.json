@@ -1,6 +1,6 @@
 {
   "name": "cascade-helper",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Cascade Helper",
   "main": "./dist/index.js",
   "scripts": {

@@ -69,7 +69,7 @@ function () {
       var results = [];
       var subKey = this.subKey;
 
-      var traverse = function traverse(cascades) {
+      var iteratorCascades = function iteratorCascades(cascades) {
         var strs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var path = arguments.length > 2 ? arguments[2] : undefined;
         var level = arguments.length > 3 ? arguments[3] : undefined;
@@ -83,7 +83,7 @@ function () {
 
           if (!(0, _lodash.isEmpty)(cascade[subKey]) && ((0, _lodash.isUndefined)(endLevel) || !(0, _lodash.isUndefined)(endLevel) && cLevel < endLevel)) {
             cLevel++;
-            return traverse(cascade[subKey], cStrs, cPath, cLevel);
+            return iteratorCascades(cascade[subKey], cStrs, cPath, cLevel);
           }
 
           results.push({
@@ -94,7 +94,7 @@ function () {
         });
       };
 
-      traverse(cascades);
+      iteratorCascades(cascades);
       return results;
     }
     /*
@@ -171,11 +171,11 @@ function () {
 
   }, {
     key: "initValues",
-    value: function initValues(cascades, levels) {
+    value: function initValues(cascades, levelCount) {
       var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var subKey = this.subKey,
           valueKey = this.valueKey;
-      return (0, _lodash.reduce)((0, _lodash.times)(levels), function (acc, _curr, level) {
+      return (0, _lodash.reduce)((0, _lodash.times)(levelCount), function (acc, _curr, level) {
         acc["level".concat(level)] = (0, _lodash.get)(cascades, "[".concat(index, "]") + (0, _lodash.times)(level, function () {
           return "".concat(subKey, "[").concat(index, "]");
         }).join('.') + valueKey);
@@ -211,7 +211,7 @@ function () {
         };
       }
 
-      var querySubCascades = function querySubCascades(startLevel, endLevel, subCascades) {
+      var iteratorSubCascades = function iteratorSubCascades(startLevel, endLevel, subCascades) {
         var targetValue = values && values["level".concat(startLevel)];
         var current = (0, _lodash.find)(subCascades, function (cascade) {
           return (0, _lodash.get)(cascade, valueKey) === targetValue;
@@ -237,12 +237,12 @@ function () {
           };
         }
 
-        return querySubCascades(startLevel + 1, endLevel, current[subKey] || []);
+        return iteratorSubCascades(startLevel + 1, endLevel, current[subKey] || []);
       };
 
-      var _querySubCascades = querySubCascades(0, prevLevel, cascades),
-          subCascades = _querySubCascades.subCascades,
-          parent = _querySubCascades.parent;
+      var _iteratorSubCascades = iteratorSubCascades(0, prevLevel, cascades),
+          subCascades = _iteratorSubCascades.subCascades,
+          parent = _iteratorSubCascades.parent;
 
       return {
         cascades: subCascades,
