@@ -881,6 +881,11 @@
   resolved "https://registry.npm.taobao.org/@emotion/weak-memoize/download/@emotion/weak-memoize-0.2.3.tgz#dfa0c92efe44a1d1a7974fb49ffeb40ef2da5a27"
   integrity sha1-36DJLv5EodGnl0+0n/60DvLaWic=
 
+"@types/lodash@^4.14.137":
+  version "4.14.137"
+  resolved "https://registry.npm.taobao.org/@types/lodash/download/@types/lodash-4.14.137.tgz#8a4804937dc6462274ffcc088df8f14fc1b368e2"
+  integrity sha1-ikgEk33GRiJ0/8wIjfjxT8GzaOI=
+
 "@types/nanoid@^2.0.0":
   version "2.0.0"
   resolved "https://registry.npm.taobao.org/@types/nanoid/download/@types/nanoid-2.0.0.tgz#b59002c475e6dfcc26e67ba563ff61b512e5ebf8"
@@ -1617,6 +1622,13 @@ caniuse-lite@^1.0.30000984:
   version "1.0.30000989"
   resolved "https://registry.npm.taobao.org/caniuse-lite/download/caniuse-lite-1.0.30000989.tgz#b9193e293ccf7e4426c5245134b8f2a56c0ac4b9"
   integrity sha1-uRk+KTzPfkQmxSRRNLjypWwKxLk=
+
+cascade-helper@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npm.taobao.org/cascade-helper/download/cascade-helper-1.0.3.tgz#5de8448d54af0e05576adac4469a246f3a1777a9"
+  integrity sha1-XehEjVSvDgVXatrERpokbzoXd6k=
+  dependencies:
+    lodash "^4.17.15"
 
 chalk@2.4.2, chalk@^2.0.0, chalk@^2.3.0, chalk@^2.4.1:
   version "2.4.2"

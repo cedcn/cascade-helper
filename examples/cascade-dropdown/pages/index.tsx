@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { find, times, isEmpty } from 'lodash'
 import nanoid from 'nanoid'
-import CascadeHelper from '../../../dist'
+import CascadeHelper from 'cascade-helper'
 import Head from 'next/head'
 import { NextPage } from 'next'
 import Select from 'react-select'

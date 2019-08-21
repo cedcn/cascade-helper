@@ -8,6 +8,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "cascade-helper": "^1.0.3",
     "lodash": "^4.17.15",
     "nanoid": "^2.0.3",
     "next": "latest",
@@ -16,6 +17,7 @@
     "react-select": "^3.0.4"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.137",
     "@types/nanoid": "^2.0.0",
     "@types/node": "^11.13.9",
     "@types/react": "^16.9.2",
