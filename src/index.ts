@@ -48,7 +48,7 @@ class CascadeHelper {
     const results: FlattenResult[] = []
     const { subKey } = this
 
-    const traverse = (cascades: Cascade[], strs: Strs = {}, path?: string, level?: number): void => {
+    const iteratorCascades = (cascades: Cascade[], strs: Strs = {}, path?: string, level?: number): void => {
       forEach(cascades, (cascade, index) => {
         let cStrs: Strs = {}
         forEach(labels, (label) => {
@@ -60,14 +60,14 @@ class CascadeHelper {
 
         if (!isEmpty(cascade[subKey]) && (isUndefined(endLevel) || (!isUndefined(endLevel) && cLevel < endLevel))) {
           cLevel++
-          return traverse(cascade[subKey], cStrs, cPath, cLevel)
+          return iteratorCascades(cascade[subKey], cStrs, cPath, cLevel)
         }
 
         results.push({ strs: cStrs, cascade: cloneDeep(cascade), path: cPath })
       })
     }
 
-    traverse(cascades)
+    iteratorCascades(cascades)
     return results
   }
 
@@ -139,11 +139,11 @@ class CascadeHelper {
    * Get init values
    * Get the first value of cascades by default
    */
-  public initValues(cascades: Cascade[], levels: number, index: number = 0): Values {
+  public initValues(cascades: Cascade[], levelCount: number, index: number = 0): Values {
     const { subKey, valueKey } = this
 
     return reduce<any, { [key: string]: string }>(
-      times(levels),
+      times(levelCount),
       (acc, _curr, level) => {
         acc[`level${level}`] = get(
           cascades,
@@ -179,7 +179,7 @@ class CascadeHelper {
       return { cascades: [], path, parent: null }
     }
 
-    const querySubCascades = (startLevel: number, endLevel: number, subCascades: Cascade[]): any => {
+    const iteratorSubCascades = (startLevel: number, endLevel: number, subCascades: Cascade[]): any => {
       const targetValue = values && values[`level${startLevel}`]
       const current = find(subCascades, (cascade) => get(cascade, valueKey) === targetValue)
       const currentIndex = indexOf(subCascades, current)
@@ -196,10 +196,10 @@ class CascadeHelper {
         }
       }
 
-      return querySubCascades(startLevel + 1, endLevel, current[subKey] || [])
+      return iteratorSubCascades(startLevel + 1, endLevel, current[subKey] || [])
     }
 
-    const { subCascades, parent } = querySubCascades(0, prevLevel, cascades)
+    const { subCascades, parent } = iteratorSubCascades(0, prevLevel, cascades)
     return { cascades: subCascades, path, parent }
   }
 
