@@ -18,7 +18,7 @@ interface FlattenResult {
   path: string
 }
 
-export const generateRandomString = (level: number = 0, index: number = 0): string => {
+export const generateRandomString = (level = 0, index = 0): string => {
   const str = Math.random()
     .toString(36)
     .substr(2, 7)
@@ -34,23 +34,18 @@ const generateCascade = (level: number, index: number): Cascade => ({
 class CascadeHelper {
   public subKey: string
   public valueKey: string
-  public constructor(subKey: string = 'children', valueKey: string = 'value') {
+  public constructor(subKey = 'children', valueKey = 'value') {
     this.subKey = subKey
     this.valueKey = valueKey
   }
 
-  public flatten(
-    cascades: Cascade[],
-    labels: string[] = [],
-    itemSeparator: string = '-',
-    endLevel?: number
-  ): FlattenResult[] {
+  public flatten(cascades: Cascade[], labels: string[] = [], itemSeparator = '-', endLevel?: number): FlattenResult[] {
     const results: FlattenResult[] = []
     const { subKey } = this
 
     const iteratorCascades = (cascades: Cascade[], strs: Strs = {}, path?: string, level?: number): void => {
       forEach(cascades, (cascade, index) => {
-        let cStrs: Strs = {}
+        const cStrs: Strs = {}
         forEach(labels, (label) => {
           cStrs[label] = !isUndefined(strs[label]) ? strs[label] + itemSeparator + cascade[label] : cascade[label]
         })
@@ -76,13 +71,13 @@ class CascadeHelper {
    */
   public cascadesFill(
     cascades: Cascade[] = [],
-    count: number = 2,
+    count = 2,
     geterateFunc: (level: number, index: number) => Cascade = generateCascade,
-    startLevel: number = 0,
-    endLevel: number = 1
+    startLevel = 0,
+    endLevel = 1
   ): Cascade[] {
     const { subKey } = this
-    let newCascades = { [subKey]: cloneDeep(cascades) }
+    const newCascades = { [subKey]: cloneDeep(cascades) }
 
     if (startLevel > endLevel) {
       return newCascades[subKey]
@@ -118,7 +113,7 @@ class CascadeHelper {
   public cascadesForEach(
     cascades: Cascade[],
     cb: (cascade: Cascade, currentlevel?: number, currentIndex?: number) => void,
-    startLevel: number = 0,
+    startLevel = 0,
     endLevel?: number
   ): void {
     const { subKey } = this
@@ -139,7 +134,7 @@ class CascadeHelper {
    * Get init values
    * Get the first value of cascades by default
    */
-  public initValues(cascades: Cascade[], levelCount: number, index: number = 0): Values {
+  public initValues(cascades: Cascade[], levelCount: number, index = 0): Values {
     const { subKey, valueKey } = this
 
     return reduce<any, { [key: string]: string }>(
@@ -209,11 +204,11 @@ class CascadeHelper {
   public parse(
     str: string,
     cb: (key: string, valueKey: string, level: number, index: number) => Cascade,
-    itemSeparator: string = '-',
-    levelSeparator: string = '\n'
+    itemSeparator = '-',
+    levelSeparator = '\n'
   ): Cascade[] {
     const { subKey, valueKey } = this
-    const parseLabels = (tArr: string[][], level: number = 0): Cascade[] => {
+    const parseLabels = (tArr: string[][], level = 0): Cascade[] => {
       const result = reduce<any, { [key: string]: string[][] }>(
         tArr,
         (acc, curr) => {
@@ -266,8 +261,8 @@ class CascadeHelper {
   public stringify(
     cascades: Cascade[],
     label: string,
-    itemSeparator: string = '-',
-    levelSeparator: string = '\n',
+    itemSeparator = '-',
+    levelSeparator = '\n',
     endLevel?: number
   ): string {
     const results = this.flatten(cascades, [label], itemSeparator, endLevel)
