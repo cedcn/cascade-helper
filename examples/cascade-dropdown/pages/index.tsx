@@ -17,7 +17,13 @@ interface OptionType {
   label: string
 }
 
-const choices = cascadeHelper.cascadesFill([], 3, generateCascadeChoices, 0, 2)
+const choices = cascadeHelper.deepFill([], {
+  count: 3,
+  geterateFunc: generateCascadeChoices,
+  startLevel: 0,
+  endLevel: 2,
+})
+
 const transformChoices = (choices: any[]): OptionType[] => {
   return choices.map((choice: any) => {
     const { value, name } = choice

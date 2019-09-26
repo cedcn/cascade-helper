@@ -15,23 +15,23 @@ const cascadeHelper = new CascadeHelper([(subKey = 'children')], [(valueKey = 'v
 
 ## Instance Methods
 
-### - deepFlatten
+### deepFlatten
 
 ```
 cascadeHelper.deepFlatten(cascades[, options])
 ```
 
-- #### **\*cascades**
+#### - **\*cascades**
 
-  cascades array
+cascades array
 
-- #### **options**
+#### - **options**
 
-  | KEY           |      TYPE      | DEFAULT |
-  | ------------- | :------------: | :-----: |
-  | labels        | Array\<string> |   []    |
-  | itemSeparator |     string     |   '-'   |
-  | endLevel      |     nubmer     |         |
+| KEY           |      TYPE      | DEFAULT |
+| ------------- | :------------: | :-----: |
+| labels        | Array\<string> |   []    |
+| itemSeparator |     string     |   '-'   |
+| endLevel      |     nubmer     |         |
 
 ```javascript
 const cascades = [
@@ -52,28 +52,28 @@ console.log(results)
  ****/
 ```
 
-### - deepForEach
+### deepForEach
 
 ```
 cascadeHelper.deepForEach(cascades, callback[, options])
 ```
 
-- #### **\*cascades**
+#### - **\*cascades**
 
-  cascades array
+cascades array
 
-- #### **\*callback**
+#### - **\*callback**
 
-  ```
-  (cascade, level, index) => void
-  ```
+```
+(cascade, level, index) => void
+```
 
-- #### **options**
+#### - **options**
 
-  | KEY        |  TYPE  | DEFAULT |
-  | ---------- | :----: | :-----: |
-  | startLevel | number |    0    |
-  | endLevel   | number |         |
+| KEY        |  TYPE  | DEFAULT |
+| ---------- | :----: | :-----: |
+| startLevel | number |    0    |
+| endLevel   | number |         |
 
 ```javascript
 const cascades = [
@@ -94,18 +94,19 @@ console.log(cascades)
  ****/
 ```
 
-### - getLevelCascades
+### getLevelCascades
 
 ```
 cascadeHelper.getLevelCascades(cascades, values, level)
 ```
 
-- #### **\*cascades**
+#### - **\*cascades**
 
-  _cascades array_
+_cascades array_
 
-- #### **\*values**
-- #### **\*level**
+#### - **\*values**
+
+#### - **\*level**
 
 ```javascript
 const cascades = [
@@ -129,10 +130,16 @@ console.log(current)
  ****/
 ```
 
-### - initValues
+### initValues
 
-### - deepFill
+### deepFill
 
-### - parse
+### parse
 
-### - stringify
+### stringify
+
+## Examples
+
+- CascadeDropdown
+
+[![Edit cascade-dropdown](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/cascade-dropdown-0bs4o?fontsize=14)
