@@ -61,11 +61,11 @@ function () {
   }
 
   _createClass(CascadeHelper, [{
-    key: "flatten",
-    value: function flatten(cascades) {
-      var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var itemSeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '-';
-      var endLevel = arguments.length > 3 ? arguments[3] : undefined;
+    key: "deepFlatten",
+    value: function deepFlatten(cascades, options) {
+      var labels = (0, _lodash.get)(options, 'labels') || [];
+      var itemSeparator = (0, _lodash.get)(options, 'itemSeparator') || '-';
+      var endLevel = (0, _lodash.get)(options, 'endLevel');
       var results = [];
       var subKey = this.subKey;
 
@@ -102,13 +102,14 @@ function () {
      */
 
   }, {
-    key: "cascadesFill",
-    value: function cascadesFill() {
+    key: "deepFill",
+    value: function deepFill() {
       var cascades = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-      var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-      var geterateFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : generateCascade;
-      var startLevel = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-      var endLevel = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+      var options = arguments.length > 1 ? arguments[1] : undefined;
+      var count = (0, _lodash.get)(options, 'count') || 2;
+      var geterateFunc = (0, _lodash.get)(options, 'geterateFunc') || generateCascade;
+      var startLevel = (0, _lodash.get)(options, 'startLevel') || 0;
+      var endLevel = (0, _lodash.get)(options, 'endLevel') || 1;
       var subKey = this.subKey;
 
       var newCascades = _defineProperty({}, subKey, (0, _lodash.cloneDeep)(cascades));
@@ -145,12 +146,12 @@ function () {
      */
 
   }, {
-    key: "cascadesForEach",
-    value: function cascadesForEach(cascades, cb) {
+    key: "deepForEach",
+    value: function deepForEach(cascades, cb, options) {
       var _this = this;
 
-      var startLevel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var endLevel = arguments.length > 3 ? arguments[3] : undefined;
+      var startLevel = (0, _lodash.get)(options, 'startLevel') || 0;
+      var endLevel = (0, _lodash.get)(options, 'endLevel');
       var subKey = this.subKey;
       (0, _lodash.forEach)(cascades, function (cascade, index) {
         cb(cascade, startLevel, index);
@@ -160,7 +161,10 @@ function () {
             return;
           }
 
-          _this.cascadesForEach(cascade[subKey], cb, startLevel + 1, endLevel);
+          _this.deepForEach(cascade[subKey], cb, {
+            startLevel: startLevel + 1,
+            endLevel: endLevel
+          });
         }
       });
     }
@@ -256,9 +260,9 @@ function () {
 
   }, {
     key: "parse",
-    value: function parse(str, cb) {
-      var itemSeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '-';
-      var levelSeparator = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '\n';
+    value: function parse(str, cb, options) {
+      var itemSeparator = (0, _lodash.get)(options, 'itemSeparator') || '-';
+      var levelSeparator = (0, _lodash.get)(options, 'levelSeparator') || '\n';
       var subKey = this.subKey,
           valueKey = this.valueKey;
 
@@ -314,11 +318,15 @@ function () {
 
   }, {
     key: "stringify",
-    value: function stringify(cascades, label) {
-      var itemSeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '-';
-      var levelSeparator = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '\n';
-      var endLevel = arguments.length > 4 ? arguments[4] : undefined;
-      var results = this.flatten(cascades, [label], itemSeparator, endLevel);
+    value: function stringify(cascades, label, options) {
+      var itemSeparator = (0, _lodash.get)(options, 'itemSeparator') || '-';
+      var levelSeparator = (0, _lodash.get)(options, 'levelSeparator') || '\n';
+      var endLevel = (0, _lodash.get)(options, 'endLevel');
+      var results = this.deepFlatten(cascades, {
+        labels: [label],
+        itemSeparator: itemSeparator,
+        endLevel: endLevel
+      });
       return (0, _lodash.map)(results, function (item) {
         return item.strs[label];
       }).join(levelSeparator);

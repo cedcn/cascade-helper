@@ -1,8 +1,12 @@
 {
   "name": "cascade-helper",
-  "version": "1.0.4",
+  "version": "1.1.4",
   "description": "Cascade Helper",
   "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cedcn/cascade-helper.git"
+  },
   "scripts": {
     "build": "yarn build-src && yarn build-dts",
     "build-src": "babel src --out-dir dist --extensions .js,.jsx,.ts,.tsx --source-maps --ignore **/*.test.ts",
@@ -12,11 +16,12 @@
     "test": "jest",
     "test-inspect": "babel-node --inspect node_modules/.bin/jest --runInBand"
   },
+  "homepage": "https://github.com/Cedcn/cascade-helper",
   "keywords": [
     "cascade"
   ],
   "author": "cedcn",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
