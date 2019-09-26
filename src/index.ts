@@ -39,7 +39,14 @@ class CascadeHelper {
     this.valueKey = valueKey
   }
 
-  public flatten(cascades: Cascade[], labels: string[] = [], itemSeparator = '-', endLevel?: number): FlattenResult[] {
+  public deepFlatten(
+    cascades: Cascade[],
+    options?: { labels?: string[]; itemSeparator?: string; endLevel?: number }
+  ): FlattenResult[] {
+    const labels = get(options, 'labels') || []
+    const itemSeparator = get(options, 'itemSeparator') || '-'
+    const endLevel = get(options, 'endLevel')
+
     const results: FlattenResult[] = []
     const { subKey } = this
 
@@ -69,13 +76,20 @@ class CascadeHelper {
   /*
    * Fill cascade
    */
-  public cascadesFill(
+  public deepFill(
     cascades: Cascade[] = [],
-    count = 2,
-    geterateFunc: (level: number, index: number) => Cascade = generateCascade,
-    startLevel = 0,
-    endLevel = 1
+    options?: {
+      count?: number
+      geterateFunc?: (level: number, index: number) => Cascade
+      startLevel?: number
+      endLevel?: number
+    }
   ): Cascade[] {
+    const count = get(options, 'count') || 2
+    const geterateFunc = get(options, 'geterateFunc') || generateCascade
+    const startLevel = get(options, 'startLevel') || 0
+    const endLevel = get(options, 'endLevel') || 1
+
     const { subKey } = this
     const newCascades = { [subKey]: cloneDeep(cascades) }
 
@@ -110,12 +124,13 @@ class CascadeHelper {
   /*
    * For each cascade
    */
-  public cascadesForEach(
+  public deepForEach(
     cascades: Cascade[],
     cb: (cascade: Cascade, currentlevel?: number, currentIndex?: number) => void,
-    startLevel = 0,
-    endLevel?: number
+    options?: { startLevel?: number; endLevel?: number }
   ): void {
+    const startLevel = get(options, 'startLevel') || 0
+    const endLevel = get(options, 'endLevel')
     const { subKey } = this
 
     forEach(cascades, (cascade, index) => {
@@ -125,7 +140,7 @@ class CascadeHelper {
           return
         }
 
-        this.cascadesForEach(cascade[subKey], cb, startLevel + 1, endLevel)
+        this.deepForEach(cascade[subKey], cb, { startLevel: startLevel + 1, endLevel })
       }
     })
   }
@@ -204,9 +219,11 @@ class CascadeHelper {
   public parse(
     str: string,
     cb: (key: string, valueKey: string, level: number, index: number) => Cascade,
-    itemSeparator = '-',
-    levelSeparator = '\n'
+    options?: { itemSeparator?: string; levelSeparator?: string }
   ): Cascade[] {
+    const itemSeparator = get(options, 'itemSeparator') || '-'
+    const levelSeparator = get(options, 'levelSeparator') || '\n'
+
     const { subKey, valueKey } = this
     const parseLabels = (tArr: string[][], level = 0): Cascade[] => {
       const result = reduce<any, { [key: string]: string[][] }>(
@@ -261,11 +278,13 @@ class CascadeHelper {
   public stringify(
     cascades: Cascade[],
     label: string,
-    itemSeparator = '-',
-    levelSeparator = '\n',
-    endLevel?: number
+    options?: { itemSeparator?: string; levelSeparator?: string; endLevel?: number }
   ): string {
-    const results = this.flatten(cascades, [label], itemSeparator, endLevel)
+    const itemSeparator = get(options, 'itemSeparator') || '-'
+    const levelSeparator = get(options, 'levelSeparator') || '\n'
+    const endLevel = get(options, 'endLevel')
+
+    const results = this.deepFlatten(cascades, { labels: [label], itemSeparator, endLevel })
     return map(results, (item) => item.strs[label]).join(levelSeparator)
   }
 }
