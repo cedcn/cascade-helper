@@ -1,7 +1,7 @@
 ## Install
 
 ```
-npm install cascade-helper
+npm install cascade-helper --save
 ```
 
 ## Class
@@ -15,16 +15,23 @@ const cascadeHelper = new CascadeHelper([(subKey = 'children')], [(valueKey = 'v
 
 ## Instance Methods
 
-### - flatten
+### - deepFlatten
 
 ```
-cascadeHelper.flatten(cascades, [labels = []], [itemSeparator = '-'], [endLevel])
+cascadeHelper.deepFlatten(cascades[, options])
 ```
 
-- **\*cascades** (_cascades array_)
-- labels (_array_)
-- itemSeparator (_string_)
-- endLevel (_number_)
+- #### **\*cascades**
+
+  cascades array
+
+- #### **options**
+
+  | KEY           |      TYPE      | DEFAULT |
+  | ------------- | :------------: | :-----: |
+  | labels        | Array\<string> |   []    |
+  | itemSeparator |     string     |   '-'   |
+  | endLevel      |     nubmer     |         |
 
 ```javascript
 const cascades = [
@@ -32,7 +39,7 @@ const cascades = [
   { name: '0.1', value: '0.1', children: [{ name: '1.0', value: '1.0' }, { name: '1.1', value: '1.1' }] },
 ]
 
-const results = cascadeHelper.flatten(cascades, ['name'])
+const results = cascadeHelper.deepFlatten(cascades, { labels: ['name'] })
 
 console.log(results)
 /****
@@ -45,19 +52,28 @@ console.log(results)
  ****/
 ```
 
-### - cascadesForEach
+### - deepForEach
 
 ```
-cascadeHelper.cascadesForEach(cascades, [callback], [startLevel = 0], [endLevel])
+cascadeHelper.deepForEach(cascades, callback[, options])
 ```
 
-- **\*cascades** (_cascades array_)
-- callback (_func_)
+- #### **\*cascades**
+
+  cascades array
+
+- #### **\*callback**
+
   ```
   (cascade, level, index) => void
   ```
-- startLevel (_number_)
-- endLevel (_number_)
+
+- #### **options**
+
+  | KEY        |  TYPE  | DEFAULT |
+  | ---------- | :----: | :-----: |
+  | startLevel | number |    0    |
+  | endLevel   | number |         |
 
 ```javascript
 const cascades = [
@@ -65,7 +81,7 @@ const cascades = [
   { name: '0.1', value: '0.1', children: [{ name: '1.0', value: '1.0' }, { name: '1.1', value: '1.1' }] },
 ]
 
-cascadeHelper.cascadesForEach(cascades, (cascade, level, index) => {
+cascadeHelper.deepForEach(cascades, (cascade, level, index) => {
   cascade.name = `modify-${level}-${index}`
 })
 
@@ -84,9 +100,12 @@ console.log(cascades)
 cascadeHelper.getLevelCascades(cascades, values, level)
 ```
 
-- **\*cascades** (_cascades array_)
-- **\*values** (_object_)
-- **\*level** (_number_)
+- #### **\*cascades**
+
+  _cascades array_
+
+- #### **\*values**
+- #### **\*level**
 
 ```javascript
 const cascades = [
@@ -112,7 +131,7 @@ console.log(current)
 
 ### - initValues
 
-### - cascadesFill
+### - deepFill
 
 ### - parse
 
