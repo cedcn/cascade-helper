@@ -80,13 +80,13 @@ class CascadeHelper {
     cascades: Cascade[] = [],
     options?: {
       count?: number
-      geterateFunc?: (level: number, index: number) => Cascade
+      generateFunc?: (level: number, index: number) => Cascade
       startLevel?: number
       endLevel?: number
     }
   ): Cascade[] {
     const count = get(options, 'count') || 2
-    const geterateFunc = get(options, 'geterateFunc') || generateCascade
+    const generateFunc = get(options, 'generateFunc') || generateCascade
     const startLevel = get(options, 'startLevel') || 0
     const endLevel = get(options, 'endLevel') || 1
 
@@ -105,7 +105,7 @@ class CascadeHelper {
       if (isEmpty(cascade[subKey])) {
         times(count, (xIndex) => {
           if (isUndefined(cascade[subKey][xIndex])) {
-            cascade[subKey][xIndex] = geterateFunc(level, xIndex)
+            cascade[subKey][xIndex] = generateFunc(level, xIndex)
           }
         })
       }
@@ -126,7 +126,7 @@ class CascadeHelper {
    */
   public deepForEach(
     cascades: Cascade[],
-    cb: (cascade: Cascade, currentlevel?: number, currentIndex?: number) => void,
+    cb: (cascade: Cascade, currentLevel?: number, currentIndex?: number) => void,
     options?: { startLevel?: number; endLevel?: number }
   ): void {
     const startLevel = get(options, 'startLevel') || 0
