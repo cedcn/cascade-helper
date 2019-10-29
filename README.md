@@ -1,3 +1,6 @@
+[![GitHub Actions CI](https://github.com/cedcn/cascade-helper/workflows/CI/badge.svg)](https://github.com/cedcn/cascade-helper/actions)
+[![NPM Package](https://img.shields.io/npm/dm/cascade-helper.svg)](https://npmjs.com/package/cascade-helper)
+
 ## Install
 
 ```
@@ -142,4 +145,4 @@ console.log(current)
 
 - CascadeDropdown
 
-[![Edit cascade-dropdown](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/cascade-dropdown-0bs4o?fontsize=14)
+[![Edit cascade-dropdown](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/Cedcn/cascade-helper/tree/master/examples/cascade-dropdown)

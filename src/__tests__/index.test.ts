@@ -233,7 +233,7 @@ describe('CascadeHelper', () => {
   test('Instance method [stringify] - should return serialize string', () => {
     const cascades = cascadeHelper.deepFill([], {
       count: 3,
-      geterateFunc: (level: number, index: number) => {
+      generateFunc: (level: number, index: number) => {
         return { name: `${level + 1}xxx${index}` }
       },
     })
