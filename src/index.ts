@@ -17,6 +17,14 @@ interface FlattenResult {
   cascade: Cascade
   path: string
 }
+type DeepForEachCallback = (cascade: Cascade, currentLevel: number, currentIndex: number) => void
+type DeepMapCallback = (
+  cascade: Cascade,
+  currentLevel: number,
+  currentIndex: number,
+  path: string,
+  parent?: Cascade
+) => void
 
 export const generateRandomString = (level = 0, index = 0): string => {
   const str = Math.random()
@@ -126,7 +134,7 @@ class CascadeHelper {
    */
   public deepForEach(
     cascades: Cascade[],
-    cb: (cascade: Cascade, currentLevel?: number, currentIndex?: number) => void,
+    cb: DeepForEachCallback,
     options?: { startLevel?: number; endLevel?: number }
   ): void {
     const startLevel = get(options, 'startLevel') || 0
@@ -143,6 +151,40 @@ class CascadeHelper {
         this.deepForEach(cascade[subKey], cb, { startLevel: startLevel + 1, endLevel })
       }
     })
+  }
+
+  /*
+   * Map cascades
+   */
+  public deepMap(cascades: Cascade[], cb: DeepMapCallback, options?: { startLevel?: number }): any[] {
+    const { subKey } = this
+    const newCascades = cloneDeep(cascades)
+
+    const iteratorCascades = (
+      cascades: Cascade[],
+      cb: DeepMapCallback,
+      options?: { startLevel?: number; parent?: Cascade; path?: string }
+    ): any[] => {
+      const startLevel = get(options, 'startLevel') || 0
+      const parent = get(options, 'parent')
+      const path = get(options, 'path')
+
+      return map(cascades, (cascade, index) => {
+        const cPath = !isUndefined(path) ? `${path}.${subKey}[${index}]` : `[${index}]`
+
+        if (!isEmpty(cascade[subKey])) {
+          cascade[subKey] = iteratorCascades(cascade[subKey], cb, {
+            startLevel: startLevel + 1,
+            parent: cascade,
+            path: cPath,
+          })
+        }
+
+        return cb(cascade, startLevel, index, cPath, parent)
+      })
+    }
+
+    return iteratorCascades(newCascades, cb, { startLevel: get(options, 'startLevel') })
   }
 
   /*

@@ -129,6 +129,55 @@ describe('CascadeHelper', () => {
     expect(cascades).toEqual(expectCascades)
   })
 
+  test('Instance method [deepMap] - should return new cascades, don‘t modify origin', () => {
+    const cascades = cascadeHelper.deepFill()
+    const cascades2 = cascades
+
+    const results = cascadeHelper.deepMap(cascades, (cascade: Cascade, currentLevel, currentIndex, path) => {
+      return { ...cascade, name: `modify-${currentLevel}-${currentIndex}`, path }
+    })
+
+    const expectResults = [
+      {
+        name: 'modify-0-0',
+        value: mockValue(0, 0),
+        path: '[0]',
+        children: [
+          {
+            name: 'modify-1-0',
+            value: mockValue(1, 0),
+            path: '[0].children[0]',
+          },
+          {
+            name: 'modify-1-1',
+            value: mockValue(1, 1),
+            path: '[0].children[1]',
+          },
+        ],
+      },
+      {
+        name: 'modify-0-1',
+        value: mockValue(0, 1),
+        path: '[1]',
+        children: [
+          {
+            name: 'modify-1-0',
+            value: mockValue(1, 0),
+            path: '[1].children[0]',
+          },
+          {
+            name: 'modify-1-1',
+            value: mockValue(1, 1),
+            path: '[1].children[1]',
+          },
+        ],
+      },
+    ]
+
+    expect(cascades2).toEqual(cascades)
+    expect(results).toEqual(expectResults)
+  })
+
   test('Instance method [initValues] - should return the first value of cascades', () => {
     const cascades = cascadeHelper.deepFill()
     const values = cascadeHelper.initValues(cascades, 2)
