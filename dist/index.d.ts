@@ -12,6 +12,8 @@ interface FlattenResult {
     cascade: Cascade;
     path: string;
 }
+declare type DeepForEachCallback = (cascade: Cascade, currentLevel: number, currentIndex: number) => void;
+declare type DeepMapCallback = (cascade: Cascade, currentLevel: number, currentIndex: number, path: string, parent?: Cascade) => void;
 export declare const generateRandomString: (level?: number, index?: number) => string;
 declare class CascadeHelper {
     subKey: string;
@@ -24,14 +26,17 @@ declare class CascadeHelper {
     }): FlattenResult[];
     deepFill(cascades?: Cascade[], options?: {
         count?: number;
-        geterateFunc?: (level: number, index: number) => Cascade;
+        generateFunc?: (level: number, index: number) => Cascade;
         startLevel?: number;
         endLevel?: number;
     }): Cascade[];
-    deepForEach(cascades: Cascade[], cb: (cascade: Cascade, currentlevel?: number, currentIndex?: number) => void, options?: {
+    deepForEach(cascades: Cascade[], cb: DeepForEachCallback, options?: {
         startLevel?: number;
         endLevel?: number;
     }): void;
+    deepMap(cascades: Cascade[], cb: DeepMapCallback, options?: {
+        startLevel?: number;
+    }): any[];
     initValues(cascades: Cascade[], levelCount: number, index?: number): Values;
     getLevelCascades(cascades: Cascade[], values: Values, level: number): {
         cascades: Cascade[];

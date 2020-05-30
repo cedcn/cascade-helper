@@ -107,7 +107,7 @@ function () {
       var cascades = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
       var options = arguments.length > 1 ? arguments[1] : undefined;
       var count = (0, _lodash.get)(options, 'count') || 2;
-      var geterateFunc = (0, _lodash.get)(options, 'geterateFunc') || generateCascade;
+      var generateFunc = (0, _lodash.get)(options, 'generateFunc') || generateCascade;
       var startLevel = (0, _lodash.get)(options, 'startLevel') || 0;
       var endLevel = (0, _lodash.get)(options, 'endLevel') || 1;
       var subKey = this.subKey;
@@ -126,7 +126,7 @@ function () {
         if ((0, _lodash.isEmpty)(cascade[subKey])) {
           (0, _lodash.times)(count, function (xIndex) {
             if ((0, _lodash.isUndefined)(cascade[subKey][xIndex])) {
-              cascade[subKey][xIndex] = geterateFunc(level, xIndex);
+              cascade[subKey][xIndex] = generateFunc(level, xIndex);
             }
           });
         }
@@ -166,6 +166,39 @@ function () {
             endLevel: endLevel
           });
         }
+      });
+    }
+    /*
+     * Map cascades
+     */
+
+  }, {
+    key: "deepMap",
+    value: function deepMap(cascades, cb, options) {
+      var subKey = this.subKey;
+      var newCascades = (0, _lodash.cloneDeep)(cascades);
+
+      var iteratorCascades = function iteratorCascades(cascades, cb, options) {
+        var startLevel = (0, _lodash.get)(options, 'startLevel') || 0;
+        var parent = (0, _lodash.get)(options, 'parent');
+        var path = (0, _lodash.get)(options, 'path');
+        return (0, _lodash.map)(cascades, function (cascade, index) {
+          var cPath = !(0, _lodash.isUndefined)(path) ? "".concat(path, ".").concat(subKey, "[").concat(index, "]") : "[".concat(index, "]");
+
+          if (!(0, _lodash.isEmpty)(cascade[subKey])) {
+            cascade[subKey] = iteratorCascades(cascade[subKey], cb, {
+              startLevel: startLevel + 1,
+              parent: cascade,
+              path: cPath
+            });
+          }
+
+          return cb(cascade, startLevel, index, cPath, parent);
+        });
+      };
+
+      return iteratorCascades(newCascades, cb, {
+        startLevel: (0, _lodash.get)(options, 'startLevel')
       });
     }
     /*
