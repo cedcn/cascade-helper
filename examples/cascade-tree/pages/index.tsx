@@ -14,12 +14,18 @@ const generateCascadeChoices = (level: number, index: number) => ({
 
 const choices = cascadeHelper.deepFill([], {
   count: 3,
-  geterateFunc: generateCascadeChoices,
+  generateFunc: generateCascadeChoices,
   startLevel: 0,
   endLevel: 2,
 })
 
 const IndexPage: NextPage = () => {
+  const gData = [
+    { title: '0-0', key: '0-0' },
+    { title: '0-1', key: '0-1' },
+    { title: '0-2', key: '0-2', children: [{ title: '0-2-0', key: '0-2-0' }] },
+  ]
+
   return (
     <div>
       <Head>
@@ -41,8 +47,7 @@ const IndexPage: NextPage = () => {
         `}</style>
         <div className="container">
           <h1>Cascade Tree</h1>
-
-          <Tree />
+          <Tree treeData={gData}/>
         </div>
       </div>
     </div>

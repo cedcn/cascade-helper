@@ -8,7 +8,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
-    "cascade-helper": "^1.1.4",
+    "cascade-helper": "^1.2.1",
     "lodash": "^4.17.15",
     "nanoid": "^2.0.3",
     "next": "latest",

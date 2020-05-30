@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "lint-eslint": "eslint --ext .js,.jsx,.ts,.tsx ./",
     "test": "jest",
-    "test-inspect": "babel-node --inspect node_modules/.bin/jest --runInBand"
+    "test-inspect": "babel-node --inspect node_modules/.bin/jest --runInBand",
+    "prepublish": "yarn build"
   },
   "homepage": "https://github.com/Cedcn/cascade-helper",
   "keywords": [

@@ -1623,10 +1623,10 @@ caniuse-lite@^1.0.30000984:
   resolved "https://registry.npm.taobao.org/caniuse-lite/download/caniuse-lite-1.0.30000989.tgz#b9193e293ccf7e4426c5245134b8f2a56c0ac4b9"
   integrity sha1-uRk+KTzPfkQmxSRRNLjypWwKxLk=
 
-cascade-helper@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.npm.taobao.org/cascade-helper/download/cascade-helper-1.1.4.tgz#3ed17f3077e7f49469e4532f5b321ac2718af3eb"
-  integrity sha1-PtF/MHfn9JRp5FMvWzIawnGK8+s=
+cascade-helper@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/cascade-helper/-/cascade-helper-1.2.1.tgz#9a4d06a8170df662c596c5a4c43670e05a8d1c9c"
+  integrity sha512-3qAyhlZzWboO6/BZUt6u21BT16lVhKUW3ShGsInTOeB5+u5wnP83dLtJAhxrds1iNe1FpQ9mld1OnDOzNuRmAQ==
   dependencies:
     lodash "^4.17.15"
 

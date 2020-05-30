@@ -19,7 +19,7 @@ interface OptionType {
 
 const choices = cascadeHelper.deepFill([], {
   count: 3,
-  geterateFunc: generateCascadeChoices,
+  generateFunc: generateCascadeChoices,
   startLevel: 0,
   endLevel: 2,
 })

@@ -1756,10 +1756,10 @@ caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001043:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001066.tgz#0a8a58a10108f2b9bf38e7b65c237b12fd9c5f04"
   integrity sha512-Gfj/WAastBtfxLws0RCh2sDbTK/8rJuSeZMecrSkNGYxPcv7EzblmDGfWQCFEQcSqYE2BRgQiJh8HOD07N5hIw==
 
-cascade-helper@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/cascade-helper/-/cascade-helper-1.2.0.tgz#84ea90086af4e2dbe43e6040dd4d8238b1c7b395"
-  integrity sha512-2cWcM3TsMY66XIcSF9hIScktN2MWJ7HF/BFmFGSEGvhEdE/+sDM5qvAXbgSbvHFDzArw/+1R2iMO9Z0x8vMCug==
+cascade-helper@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/cascade-helper/-/cascade-helper-1.2.1.tgz#9a4d06a8170df662c596c5a4c43670e05a8d1c9c"
+  integrity sha512-3qAyhlZzWboO6/BZUt6u21BT16lVhKUW3ShGsInTOeB5+u5wnP83dLtJAhxrds1iNe1FpQ9mld1OnDOzNuRmAQ==
   dependencies:
     lodash "^4.17.15"
 
