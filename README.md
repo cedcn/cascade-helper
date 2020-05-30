@@ -97,6 +97,47 @@ console.log(cascades)
  ****/
 ```
 
+### deepMap
+
+```
+cascadeHelper.deepMap(cascades, callback[, options])
+```
+
+#### - **\*cascades**
+
+cascades array
+
+#### - **\*callback**
+
+```
+(cascade, level, index, path, parent) => void
+```
+
+#### - **options**
+
+| KEY        |  TYPE  | DEFAULT |
+| ---------- | :----: | :-----: |
+| startLevel | number |    0    |
+
+```javascript
+const cascades = [
+  { name: '0.0', value: '0.0', children: [{ name: '1.0', value: '1.0' }, { name: '1.1', value: '1.1' }] },
+  { name: '0.1', value: '0.1', children: [{ name: '1.0', value: '1.0' }, { name: '1.1', value: '1.1' }] },
+]
+
+const results = cascadeHelper.deepMap(cascades, (cascade, level, index, path) => {
+  return { ...cascade, name: `modify-${currentLevel}-${currentIndex}`, path }
+})
+
+console.log(results)
+/****
+[
+  { name: 'modify-0-0', value: '0.0', path: '[0]', children: [{ name: 'modify-1-0', value: '1.0', path: '[0].children[0]' }, { name: 'modify-1-1', value: '1.1', path: '[0].children[1]'}] },
+  { name: 'modify-0-1', value: '0.1', path: '[1]', children: [{ name: 'modify-1-0', value: '1.0', path: '[1].children[0]' }, { name: 'modify-1-1', value: '1.1', path: '[1].children[1]'}] },
+]
+ ****/
+```
+
 ### getLevelCascades
 
 ```
