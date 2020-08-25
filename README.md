@@ -26,7 +26,7 @@ cascadeHelper.deepFlatten(cascades[, options])
 
 #### - **\*cascades**
 
-cascades array
+Array\<Cascade>
 
 #### - **options**
 
@@ -63,13 +63,19 @@ cascadeHelper.deepForEach(cascades, callback[, options])
 
 #### - **\*cascades**
 
-cascades array
+Array\<Cascade>
 
 #### - **\*callback**
 
 ```
 (cascade, level, index) => void
 ```
+
+| ARG     |  TYPE   |
+| ------- | :-----: |
+| cascade | Cascade |
+| level   | number  |
+| index   | number  |
 
 #### - **options**
 
@@ -105,13 +111,21 @@ cascadeHelper.deepMap(cascades, callback[, options])
 
 #### - **\*cascades**
 
-cascades array
+Array\<Cascade>
 
 #### - **\*callback**
 
 ```
 (cascade, level, index, path, parent) => void
 ```
+
+| ARG     |  TYPE   |
+| ------- | :-----: |
+| cascade | Cascade |
+| level   | number  |
+| index   | number  |
+| path    | string  |
+| parent  | Cascade |
 
 #### - **options**
 
@@ -146,7 +160,7 @@ cascadeHelper.getLevelCascades(cascades, values, level)
 
 #### - **\*cascades**
 
-_cascades array_
+Array\<Cascade>
 
 #### - **\*values**
 
@@ -179,6 +193,58 @@ console.log(current)
 ### deepFill
 
 ### parse
+
+```
+cascadeHelper.parse(str, values, level)
+```
+
+#### - **\*str**
+
+_string_
+
+#### - **\*callback**
+
+```
+(key, valueKey, level, index) => Cascade
+```
+
+| ARG      |  TYPE  |
+| -------- | :----: |
+| key      | string |
+| valueKey | string |
+| level    | number |
+| index    | number |
+
+#### - **options**
+
+| KEY            |  TYPE  | DEFAULT |
+| -------------- | :----: | :-----: |
+| itemSeparator  | string |   '-'   |
+| levelSeparator | string |  '\n'   |
+
+```javascript
+const str = '1-1\n1-2\n2-1\n1-1-1'
+
+const results = cascadeHelper.parse(str, (key, valueKey, level, index) => {
+  return { name: key, [valueKey]: `${level}.${index}`, other: 'other' }
+})
+
+console.log(results)
+/****
+[
+  {
+    name: '1',
+    value: '0.0',
+    other: 'other',
+    children: [
+      { name: '1', value: '1.0', other: 'other', children: [{ name: '1', value: '2.0', other: 'other' }] },
+      { name: '2', value: '1.1', other: 'other' },
+    ],
+  },
+  { name: '2', value: '0.1', other: 'other', children: [{ name: '1', value: '1.0', other: 'other' }] },
+]
+ ****/
+```
 
 ### stringify
 

@@ -1,4 +1,4 @@
-import { isEmpty, forEach, isUndefined, cloneDeep, get, trim, find, filter, map, reduce, indexOf, times } from 'lodash'
+import { isEmpty, forEach, isUndefined, cloneDeep, get, trim, find, slice, map, reduce, indexOf, times } from 'lodash'
 
 export interface Cascade {
   [key: string]: any
@@ -268,37 +268,42 @@ class CascadeHelper {
 
     const { subKey, valueKey } = this
     const parseLabels = (tArr: string[][], level = 0): Cascade[] => {
-      const result = reduce<any, { [key: string]: string[][] }>(
+      const result = reduce(
         tArr,
         (acc, curr) => {
-          if (!acc[curr[0]]) {
-            acc[curr[0]] = []
+          const key = curr[0]
+
+          let target = find(acc, ['key', key])
+          if (!target) {
+            target = { key, sub: [] }
+            acc.push(target)
           }
-          const newCurr = filter(curr, (item) => item !== curr[0])
-          if (newCurr.length > 0) {
-            acc[curr[0]] = [...acc[curr[0]], newCurr]
+
+          const sub = slice(curr, 1)
+
+          if (sub.length > 0) {
+            target.sub = [...target.sub, sub]
           }
 
           return acc
         },
-        {}
+        [] as { sub: string[][]; key: string }[]
       )
+
       const cLevel = level
-      let index = 0
       level++
-      return map(result, (item, key) => {
+      return map(result, (item, index) => {
         let cascade
 
-        if (isEmpty(item)) {
-          cascade = { ...cb(key, valueKey, cLevel, index) }
+        if (isEmpty(item.sub)) {
+          cascade = { ...cb(item.key, valueKey, cLevel, index) }
         } else {
           cascade = {
-            [subKey]: parseLabels(item, level),
-            ...cb(key, valueKey, cLevel, index),
+            [subKey]: parseLabels(item.sub, level),
+            ...cb(item.key, valueKey, cLevel, index),
           }
         }
 
-        index++
         return cascade
       })
     }
