@@ -190,12 +190,20 @@ console.log(current)
 
 ### initValues
 
+```
+cascadeHelper.initValues(cascades, level[, index])
+```
+
 ### deepFill
+
+```
+cascadeHelper.deepFill(cascades[, options])
+```
 
 ### parse
 
 ```
-cascadeHelper.parse(str, values, level)
+cascadeHelper.parse(str, callback[, options])
 ```
 
 #### - **\*str**
@@ -247,6 +255,10 @@ console.log(results)
 ```
 
 ### stringify
+
+```
+cascadeHelper.stringify(cascades, label[, options])
+```
 
 ## Examples
 
