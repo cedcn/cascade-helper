@@ -302,33 +302,36 @@ function () {
       var parseLabels = function parseLabels(tArr) {
         var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
         var result = (0, _lodash.reduce)(tArr, function (acc, curr) {
-          if (!acc[curr[0]]) {
-            acc[curr[0]] = [];
+          var key = curr[0];
+          var target = (0, _lodash.find)(acc, ['key', key]);
+
+          if (!target) {
+            target = {
+              key: key,
+              sub: []
+            };
+            acc.push(target);
           }
 
-          var newCurr = (0, _lodash.filter)(curr, function (item) {
-            return item !== curr[0];
-          });
+          var sub = (0, _lodash.slice)(curr, 1);
 
-          if (newCurr.length > 0) {
-            acc[curr[0]] = [].concat(_toConsumableArray(acc[curr[0]]), [newCurr]);
+          if (sub.length > 0) {
+            target.sub = [].concat(_toConsumableArray(target.sub), [sub]);
           }
 
           return acc;
-        }, {});
+        }, []);
         var cLevel = level;
-        var index = 0;
         level++;
-        return (0, _lodash.map)(result, function (item, key) {
+        return (0, _lodash.map)(result, function (item, index) {
           var cascade;
 
-          if ((0, _lodash.isEmpty)(item)) {
-            cascade = _objectSpread({}, cb(key, valueKey, cLevel, index));
+          if ((0, _lodash.isEmpty)(item.sub)) {
+            cascade = _objectSpread({}, cb(item.key, valueKey, cLevel, index));
           } else {
-            cascade = _objectSpread(_defineProperty({}, subKey, parseLabels(item, level)), cb(key, valueKey, cLevel, index));
+            cascade = _objectSpread(_defineProperty({}, subKey, parseLabels(item.sub, level)), cb(item.key, valueKey, cLevel, index));
           }
 
-          index++;
           return cascade;
         });
       };
